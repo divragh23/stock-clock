@@ -312,9 +312,14 @@ systemctl reload nginx
 
 ## Operational notes & gotchas
 
-- **Yahoo rate-limits cloud IPs.** That's why the design leans on the nightly batch + cache rather
-  than hammering yfinance per request. On-demand fetches happen only when a ticker is missing or
-  stale, with retry/backoff. A 429/empty result cleanly degrades to cached data.
+- **Yahoo rate-limits/blocks cloud IPs — and it's a TLS-fingerprint block, not just an IP one.**
+  From a DigitalOcean/AWS/etc. droplet, the default HTTP client gets `HTTP 429 Too Many Requests`
+  even with a browser `User-Agent`. The fix (already baked in) is **yfinance ≥ 1.4 + `curl_cffi`**,
+  which gives requests a genuine Chrome TLS fingerprint and sails through. Both are pinned in
+  `requirements.txt`. If you ever see empty price history / "possibly delisted" on the server, check
+  `pip show yfinance curl_cffi` first — an old yfinance (0.2.x) will be silently 429'd.
+  The design still leans on the nightly batch + cache (on-demand fetches happen only when a ticker
+  is missing or stale, with retry/backoff), and any failure cleanly degrades to cached data.
 - **No Finnhub key?** Everything still works from yfinance + cache; earnings sessions are reported
   as `unknown` (assumed AMC, flagged in the table) and there is no live-quote fallback.
 - **CORS:** none of these upstream APIs are browser-callable, so *all* data fetching is server-side.

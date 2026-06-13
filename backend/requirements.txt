@@ -1,6 +1,10 @@
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
-yfinance==0.2.51
+yfinance==1.4.1
+# curl_cffi gives yfinance a real Chrome TLS fingerprint, which is REQUIRED to
+# fetch from Yahoo on datacenter IPs (DigitalOcean/AWS/etc.) — Yahoo 429s the
+# default client by TLS fingerprint, not just by IP. See README "Operational notes".
+curl_cffi==0.15.0
 pandas==2.2.3
 lxml==5.3.0
 requests==2.32.3

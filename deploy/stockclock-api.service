@@ -1,0 +1,37 @@
+# systemd unit for the FastAPI backend (uvicorn).
+# Install to /etc/systemd/system/stockclock-api.service
+#
+# IMPORTANT: run a SINGLE worker. APScheduler lives in-process, so multiple
+# workers would each fire the nightly refresh. One worker is plenty here — all
+# real work is cached and the app is read-mostly.
+
+[Unit]
+Description=Stock Clock API (FastAPI/uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=stockclock
+Group=stockclock
+WorkingDirectory=/opt/stockclock/backend
+
+# Secrets + config live here (chmod 600). See README for contents.
+EnvironmentFile=/etc/stockclock/stockclock.env
+
+# Creates/owns /var/lib/stockclock for the SQLite cache (set CACHE_PATH to
+# /var/lib/stockclock/cache.db in the EnvironmentFile).
+StateDirectory=stockclock
+
+ExecStart=/opt/stockclock/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1
+
+Restart=on-failure
+RestartSec=3
+
+# Light hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

@@ -59,6 +59,33 @@ def fetch_prices(ticker: str) -> pd.DataFrame:
     return _with_retry(_do, f"history({ticker})")
 
 
+def search_symbols(query: str, limit: int = 10) -> list[dict]:
+    """Yahoo symbol search — resolve a company name / partial query to tickers.
+
+    Uses the same browser-impersonated client as the price/earnings calls, so it
+    works from datacenter IPs. Single attempt (no backoff) to stay snappy for an
+    interactive typeahead; raises on failure so the caller can fall back.
+    """
+    query = (query or "").strip()
+    if not query:
+        return []
+    search = yf.Search(query, max_results=limit)
+    out: list[dict] = []
+    for q in (getattr(search, "quotes", None) or []):
+        symbol = q.get("symbol")
+        if not symbol:
+            continue
+        out.append(
+            {
+                "symbol": symbol,
+                "name": (q.get("shortname") or q.get("longname") or "").strip(),
+                "exchange": q.get("exchange") or "",
+                "type": (q.get("quoteType") or "").upper(),
+            }
+        )
+    return out
+
+
 def fetch_earnings(ticker: str) -> Optional[pd.DataFrame]:
     """Return an earnings-dates DataFrame, or None.
 

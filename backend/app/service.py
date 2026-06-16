@@ -168,6 +168,43 @@ def get_stock(ticker: str, force_refresh: bool = False) -> dict:
     return _build_payload(ticker, snapshot, degraded)
 
 
+# --- symbol search -----------------------------------------------------------
+# Drop things that aren't tradable equities/funds for this dashboard.
+_SEARCH_DROP_TYPES = {"CRYPTOCURRENCY", "CURRENCY", "FUTURE"}
+
+
+def search_symbols(query: str, limit: int = 7) -> list[dict]:
+    """Resolve a company name / partial query to ticker symbols.
+
+    Yahoo (yfinance, browser-impersonated) is primary; Finnhub /search is the
+    fallback. Output is source-agnostic: [{symbol, name, exchange, type}].
+    """
+    query = (query or "").strip()
+    if not query:
+        return []
+
+    results: list[dict] = []
+    try:
+        results = yfinance_source.search_symbols(query, limit=limit * 2)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("yahoo symbol search failed for %r: %s", query, exc)
+    if not results:
+        try:
+            results = finnhub_source.search_symbols(query)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("finnhub symbol search failed for %r: %s", query, exc)
+
+    seen: set[str] = set()
+    cleaned: list[dict] = []
+    for r in results:
+        symbol = (r.get("symbol") or "").upper()
+        if not symbol or symbol in seen or r.get("type") in _SEARCH_DROP_TYPES:
+            continue
+        seen.add(symbol)
+        cleaned.append({**r, "symbol": symbol})
+    return cleaned[:limit]
+
+
 # --- health ------------------------------------------------------------------
 def stale_tickers() -> list[str]:
     out = []

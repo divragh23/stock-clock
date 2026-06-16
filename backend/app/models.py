@@ -95,6 +95,13 @@ class StockResponse(BaseModel):
     earnings: list[EarningsReaction] = []
 
 
+class SymbolMatch(BaseModel):
+    symbol: str
+    name: str = ""
+    exchange: str = ""
+    type: str = ""
+
+
 class HealthResponse(BaseModel):
     status: str
     last_refresh: Optional[str] = None

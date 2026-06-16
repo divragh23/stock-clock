@@ -28,6 +28,10 @@ export function getHealth() {
   return getJSON(`/api/health`);
 }
 
+export function searchSymbols(q) {
+  return getJSON(`/api/search?q=${encodeURIComponent(q)}`);
+}
+
 export function refreshTicker(ticker) {
   return getJSON(`/api/refresh`, {
     method: "POST",

@@ -13,7 +13,7 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import config, db, scheduler, service
-from .models import HealthResponse, RefreshResult, StockResponse
+from .models import HealthResponse, RefreshResult, StockResponse, SymbolMatch
 
 logging.basicConfig(
     level=logging.INFO,
@@ -56,6 +56,15 @@ def health() -> HealthResponse:
         cached_tickers=db.all_tickers(),
         watchlist=config.TICKERS,
     )
+
+
+@app.get("/api/search", response_model=list[SymbolMatch])
+def symbol_search(q: str = "") -> list[SymbolMatch]:
+    """Resolve a company name or partial ticker to matching symbols (typeahead)."""
+    q = (q or "").strip()
+    if not q:
+        return []
+    return [SymbolMatch(**m) for m in service.search_symbols(q)]
 
 
 @app.get("/api/stock/{ticker}", response_model=StockResponse)

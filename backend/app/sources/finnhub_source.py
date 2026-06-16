@@ -71,6 +71,30 @@ def fetch_quote(ticker: str) -> Optional[dict]:
     }
 
 
+def search_symbols(query: str) -> list[dict]:
+    """Finnhub symbol search (/search) — fallback for the Yahoo search.
+
+    Returns [] when Finnhub is disabled or on any failure.
+    """
+    data = _get("/search", {"q": query})
+    if not data:
+        return []
+    out: list[dict] = []
+    for x in data.get("result", []) or []:
+        symbol = x.get("symbol")
+        if not symbol:
+            continue
+        out.append(
+            {
+                "symbol": symbol,
+                "name": x.get("description", "") or "",
+                "exchange": "",
+                "type": (x.get("type", "") or "").upper(),
+            }
+        )
+    return out
+
+
 def _normalize_hour(hour: Optional[str]) -> str:
     """Map Finnhub's `hour` field to our session vocabulary."""
     h = (hour or "").strip().lower()

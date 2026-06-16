@@ -18,12 +18,13 @@ export default function UserMenu({ user, onManageAccounts, onLogout }) {
     <div className="usermenu" ref={ref}>
       <button className="usermenu-trigger" onClick={() => setOpen((o) => !o)} title={user?.username}>
         <span className="usermenu-avatar">{initial}</span>
-        <span className="usermenu-name">{user?.username}</span>
-        {user?.is_admin && <span className="usermenu-admin">admin</span>}
       </button>
       {open && (
         <div className="usermenu-pop">
-          <div className="usermenu-head">{user?.username}</div>
+          <div className="usermenu-head">
+            {user?.username}
+            {user?.is_admin && <span className="usermenu-admin">admin</span>}
+          </div>
           {user?.is_admin && (
             <button
               className="usermenu-item"

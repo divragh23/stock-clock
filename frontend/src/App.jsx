@@ -9,12 +9,13 @@ import UserMenu from "./components/UserMenu.jsx";
 import MyBar from "./components/MyBar.jsx";
 import NotesBox from "./components/NotesBox.jsx";
 import AdminPanel from "./components/AdminPanel.jsx";
+import ThemeDial from "./components/ThemeDial.jsx";
 
 const FALLBACK_TICKER = "NVDA";
 
 export default function App() {
-  // undefined = checking auth, null = logged out, object = logged in
   const [user, setUser] = useState(undefined);
+  const [entering, setEntering] = useState(false);
 
   const [ticker, setTicker] = useState(FALLBACK_TICKER);
   const [data, setData] = useState(null);
@@ -48,7 +49,6 @@ export default function App() {
     }
   }, []);
 
-  // Bootstrap: who am I?
   useEffect(() => {
     api.setUnauthorizedHandler(() => {
       setUser(null);
@@ -57,7 +57,6 @@ export default function App() {
     api.getMe().then(setUser).catch(() => setUser(null));
   }, []);
 
-  // On login, load personal data and the starting ticker.
   useEffect(() => {
     if (!user) return;
     Promise.all([api.getWatchlist(), api.getRecent(), api.getPreferences()])
@@ -70,6 +69,12 @@ export default function App() {
       })
       .catch(() => load(FALLBACK_TICKER));
   }, [user, load]);
+
+  function handleLogin(u) {
+    setEntering(true);
+    setUser(u);
+    setTimeout(() => setEntering(false), 600);
+  }
 
   async function toggleWatch() {
     const t = data?.ticker;
@@ -105,24 +110,26 @@ export default function App() {
   }
 
   if (user === undefined) return <div className="loading">Loading…</div>;
-  if (user === null) return <LoginPage onLogin={setUser} />;
+  if (user === null) return <LoginPage onLogin={handleLogin} />;
 
   const inWatchlist = !!data && watchlist.includes(data.ticker);
   const isDefault = prefs?.default_ticker === ticker && prefs?.default_range === chartRange;
 
   return (
-    <div className="app">
+    <div className={`app ${entering ? "app-enter" : ""}`}>
       <header className="app-header">
         <div className="brand">
-          <span className="brand-mark">◴</span> Stock Clock
+          <span className="brand-mark">&#9716;</span> Stock Clock
         </div>
-        <div className="header-right">
+        <div className="header-center">
           <TickerInput
             current={data?.ticker}
             loading={loading}
             onSubmit={(t) => load(t)}
             onRefresh={() => load(ticker, { forceRefresh: true })}
           />
+        </div>
+        <div className="header-right">
           <UserMenu user={user} onManageAccounts={() => setShowAdmin(true)} onLogout={handleLogout} />
         </div>
       </header>
@@ -133,7 +140,7 @@ export default function App() {
         <div className="banner banner-error" role="alert">
           <span className="banner-dot" aria-hidden="true" />
           <div className="banner-text">
-            <strong>Couldn’t load {ticker}.</strong>
+            <strong>Couldn't load {ticker}.</strong>
             <div className="small">{error}</div>
           </div>
         </div>
@@ -189,9 +196,11 @@ export default function App() {
 
       {showAdmin && <AdminPanel me={user} onClose={() => setShowAdmin(false)} />}
 
+      <ThemeDial />
+
       <footer className="app-footer">
         <span>
-          Signed in as {user.username} · Primary: yfinance · Secondary: Finnhub · Backup: local cache
+          Primary: yfinance · Secondary: Finnhub · Backup: local cache
         </span>
       </footer>
     </div>

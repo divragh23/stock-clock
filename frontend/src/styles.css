@@ -31,23 +31,41 @@ body {
   padding: 20px 18px 60px;
 }
 
+/* --- login → dashboard transition --- */
+@keyframes dashEnter {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.app-enter {
+  animation: dashEnter 0.55s ease-out both;
+}
+
 /* --- header --- */
 .app-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
   align-items: center;
-  justify-content: space-between;
+  gap: 14px;
   margin-bottom: 16px;
 }
 .brand {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.2px;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 .brand-mark {
   color: var(--accent);
   margin-right: 6px;
+}
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+.header-right {
+  flex: 0 0 auto;
 }
 .ticker-form {
   display: flex;
@@ -421,12 +439,82 @@ body {
   text-align: center;
 }
 
-/* --- header layout with user menu --- */
-.header-right {
+/* --- theme dial --- */
+.theme-dial {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 80;
+}
+.theme-dial-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, transform 0.3s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.theme-dial-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: rotate(45deg);
+}
+.theme-pop {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  min-width: 170px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+}
+.theme-pop-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  padding: 4px 10px 8px;
+}
+.theme-opt {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+.theme-opt:hover {
+  background: rgba(255,255,255,0.05);
+}
+.theme-opt.active {
+  background: rgba(76,141,255,0.12);
+}
+.theme-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+.theme-opt-label {
+  flex: 1;
+}
+.theme-check {
+  color: var(--accent);
+  font-size: 14px;
 }
 
 /* --- login page --- */
@@ -503,40 +591,33 @@ body {
 .usermenu-trigger {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 999px;
-  padding: 5px 12px 5px 5px;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
   cursor: pointer;
-  font-size: 13px;
 }
 .usermenu-avatar {
-  width: 26px;
-  height: 26px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
   display: grid;
   place-items: center;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
+  transition: box-shadow 0.2s;
 }
-.usermenu-name {
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.usermenu-trigger:hover .usermenu-avatar {
+  box-shadow: 0 0 0 3px rgba(76, 141, 255, 0.25);
 }
 .usermenu-admin {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   color: #ffd27e;
-  border: 1px solid rgba(255, 210, 126, 0.4);
-  border-radius: 5px;
-  padding: 1px 5px;
+  margin-left: 6px;
 }
 .usermenu-pop {
   position: absolute;

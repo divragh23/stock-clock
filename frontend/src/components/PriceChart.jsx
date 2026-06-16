@@ -19,8 +19,10 @@ const RANGES = [
   { key: "5y", label: "5Y", days: 100000 },
 ];
 
-export default function PriceChart({ series }) {
-  const [range, setRange] = useState("3m");
+export default function PriceChart({ series, range: rangeProp, onRangeChange }) {
+  const [internalRange, setInternalRange] = useState("3m");
+  const range = rangeProp || internalRange;
+  const setRange = onRangeChange || setInternalRange;
 
   const data = useMemo(() => {
     if (!series || series.length === 0) return [];

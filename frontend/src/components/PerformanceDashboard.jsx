@@ -2,7 +2,17 @@ import ReturnCard from "./ReturnCard.jsx";
 import PriceChart from "./PriceChart.jsx";
 import { money, pct, signClass, prettyDate } from "../format.js";
 
-export default function PerformanceDashboard({ ticker, performance, liveQuote }) {
+export default function PerformanceDashboard({
+  ticker,
+  performance,
+  liveQuote,
+  inWatchlist,
+  onToggleWatch,
+  onSetDefault,
+  isDefault,
+  chartRange,
+  onChartRange,
+}) {
   const returns = performance?.returns || [];
   const series = performance?.price_series || [];
 
@@ -22,6 +32,23 @@ export default function PerformanceDashboard({ ticker, performance, liveQuote })
             {liveQuote?.source ? ` · via ${liveQuote.source}` : ""}
           </div>
         </div>
+        <div className="topline-actions">
+          <button
+            className={`star-btn ${inWatchlist ? "on" : ""}`}
+            onClick={onToggleWatch}
+            title={inWatchlist ? "Remove from your watchlist" : "Add to your watchlist"}
+          >
+            {inWatchlist ? "★ In watchlist" : "☆ Add to watchlist"}
+          </button>
+          <button
+            className="btn btn-ghost small-btn"
+            onClick={onSetDefault}
+            disabled={isDefault}
+            title="Open to this stock and chart range by default"
+          >
+            {isDefault ? "Default ✓" : "Set as default"}
+          </button>
+        </div>
       </div>
 
       <h2 className="section-title">Trailing returns</h2>
@@ -31,7 +58,7 @@ export default function PerformanceDashboard({ ticker, performance, liveQuote })
         ))}
       </div>
 
-      <PriceChart series={series} />
+      <PriceChart series={series} range={chartRange} onRangeChange={onChartRange} />
     </section>
   );
 }

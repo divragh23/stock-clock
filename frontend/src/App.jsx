@@ -1,40 +1,114 @@
 import { useCallback, useEffect, useState } from "react";
-import { getStock } from "./api.js";
+import * as api from "./api.js";
 import StatusBanner from "./components/StatusBanner.jsx";
 import TickerInput from "./components/TickerInput.jsx";
 import PerformanceDashboard from "./components/PerformanceDashboard.jsx";
 import EarningsDashboard from "./components/EarningsDashboard.jsx";
+import LoginPage from "./components/LoginPage.jsx";
+import UserMenu from "./components/UserMenu.jsx";
+import MyBar from "./components/MyBar.jsx";
+import NotesBox from "./components/NotesBox.jsx";
+import AdminPanel from "./components/AdminPanel.jsx";
 
-const DEFAULT_TICKER = "NVDA";
+const FALLBACK_TICKER = "NVDA";
 
 export default function App() {
-  const [ticker, setTicker] = useState(DEFAULT_TICKER);
+  // undefined = checking auth, null = logged out, object = logged in
+  const [user, setUser] = useState(undefined);
+
+  const [ticker, setTicker] = useState(FALLBACK_TICKER);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [tab, setTab] = useState("performance");
+  const [chartRange, setChartRange] = useState("3m");
+
+  const [watchlist, setWatchlist] = useState([]);
+  const [recent, setRecent] = useState([]);
+  const [prefs, setPrefs] = useState({ default_ticker: null, default_range: null });
+  const [note, setNote] = useState("");
+  const [showAdmin, setShowAdmin] = useState(false);
 
   const load = useCallback(async (t, { forceRefresh = false } = {}) => {
     setLoading(true);
     setError(null);
     try {
-      // refresh=true forces a server-side live refresh and returns the result in
-      // one call. On failure the server still returns cached data + an honest
-      // banner (degraded), so we don't special-case errors here.
-      const payload = await getStock(t, { refresh: forceRefresh });
+      const payload = await api.getStock(t, { refresh: forceRefresh });
       setData(payload);
       setTicker(payload.ticker);
+      api.getRecent().then(setRecent).catch(() => {});
+      api.getNote(payload.ticker).then((n) => setNote(n.body || "")).catch(() => setNote(""));
     } catch (e) {
-      setError(e.message || "Failed to load data.");
-      setData(null);
+      if (e.status !== 401) {
+        setError(e.message || "Failed to load data.");
+        setData(null);
+      }
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // Bootstrap: who am I?
   useEffect(() => {
-    load(DEFAULT_TICKER);
-  }, [load]);
+    api.setUnauthorizedHandler(() => {
+      setUser(null);
+      setData(null);
+    });
+    api.getMe().then(setUser).catch(() => setUser(null));
+  }, []);
+
+  // On login, load personal data and the starting ticker.
+  useEffect(() => {
+    if (!user) return;
+    Promise.all([api.getWatchlist(), api.getRecent(), api.getPreferences()])
+      .then(([wl, rc, pr]) => {
+        setWatchlist(wl || []);
+        setRecent(rc || []);
+        setPrefs(pr || {});
+        if (pr?.default_range) setChartRange(pr.default_range);
+        load(pr?.default_ticker || FALLBACK_TICKER);
+      })
+      .catch(() => load(FALLBACK_TICKER));
+  }, [user, load]);
+
+  async function toggleWatch() {
+    const t = data?.ticker;
+    if (!t) return;
+    try {
+      const next = watchlist.includes(t) ? await api.removeWatchlist(t) : await api.addWatchlist(t);
+      setWatchlist(next);
+    } catch (e) {
+      if (e.status !== 401) setError(e.message);
+    }
+  }
+
+  async function saveNote(text) {
+    await api.setNote(ticker, text);
+    setNote(text);
+  }
+
+  async function setDefault() {
+    try {
+      const p = await api.setPreferences({ default_ticker: ticker, default_range: chartRange });
+      setPrefs(p);
+    } catch (e) {
+      if (e.status !== 401) setError(e.message);
+    }
+  }
+
+  async function handleLogout() {
+    await api.logout();
+    setUser(null);
+    setData(null);
+    setWatchlist([]);
+    setRecent([]);
+  }
+
+  if (user === undefined) return <div className="loading">Loading…</div>;
+  if (user === null) return <LoginPage onLogin={setUser} />;
+
+  const inWatchlist = !!data && watchlist.includes(data.ticker);
+  const isDefault = prefs?.default_ticker === ticker && prefs?.default_range === chartRange;
 
   return (
     <div className="app">
@@ -42,12 +116,15 @@ export default function App() {
         <div className="brand">
           <span className="brand-mark">◴</span> Stock Clock
         </div>
-        <TickerInput
-          current={data?.ticker}
-          loading={loading}
-          onSubmit={(t) => load(t)}
-          onRefresh={() => load(ticker, { forceRefresh: true })}
-        />
+        <div className="header-right">
+          <TickerInput
+            current={data?.ticker}
+            loading={loading}
+            onSubmit={(t) => load(t)}
+            onRefresh={() => load(ticker, { forceRefresh: true })}
+          />
+          <UserMenu user={user} onManageAccounts={() => setShowAdmin(true)} onLogout={handleLogout} />
+        </div>
       </header>
 
       {data?.meta && <StatusBanner meta={data.meta} />}
@@ -61,6 +138,14 @@ export default function App() {
           </div>
         </div>
       )}
+
+      <MyBar
+        watchlist={watchlist}
+        recent={recent}
+        current={data?.ticker}
+        onPick={(t) => load(t)}
+        onRemove={async (t) => setWatchlist(await api.removeWatchlist(t))}
+      />
 
       {data && (
         <>
@@ -80,11 +165,20 @@ export default function App() {
           </nav>
 
           {tab === "performance" ? (
-            <PerformanceDashboard
-              ticker={data.ticker}
-              performance={data.performance}
-              liveQuote={data.live_quote}
-            />
+            <>
+              <PerformanceDashboard
+                ticker={data.ticker}
+                performance={data.performance}
+                liveQuote={data.live_quote}
+                inWatchlist={inWatchlist}
+                onToggleWatch={toggleWatch}
+                onSetDefault={setDefault}
+                isDefault={isDefault}
+                chartRange={chartRange}
+                onChartRange={setChartRange}
+              />
+              <NotesBox ticker={data.ticker} value={note} onSave={saveNote} />
+            </>
           ) : (
             <EarningsDashboard reactions={data.earnings} />
           )}
@@ -93,10 +187,11 @@ export default function App() {
 
       {!data && loading && <div className="loading">Loading {ticker}…</div>}
 
+      {showAdmin && <AdminPanel me={user} onClose={() => setShowAdmin(false)} />}
+
       <footer className="app-footer">
         <span>
-          Primary: yfinance · Secondary: Finnhub (live-quote fallback + BMO/AMC) · Backup: local
-          cache
+          Signed in as {user.username} · Primary: yfinance · Secondary: Finnhub · Backup: local cache
         </span>
       </footer>
     </div>

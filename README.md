@@ -106,6 +106,8 @@ Set these for the backend (a `.env` for local dev, or the systemd `EnvironmentFi
 | Var | Default | Purpose |
 |-----|---------|---------|
 | `FINNHUB_API_KEY` | *(empty)* | Finnhub key. Empty = sessions `unknown`, no live-quote fallback. |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | *(empty)* | Bootstrap admin account, created on first startup if the users table is empty. The admin manages other accounts. |
+| `SESSION_TTL_DAYS` | `30` | How long a login session stays valid. |
 | `CACHE_PATH` | `./cache.db` | SQLite file path. Use a stable path in prod, e.g. `/var/lib/stockclock/cache.db`. |
 | `TICKERS` | `NVDA,AAPL,MSFT` | Watch-list refreshed nightly (plus any on-demand ticker). |
 | `STALE_AFTER_HOURS` | `30` | Snapshot older than this is flagged stale to the UI. |
@@ -185,6 +187,14 @@ origin — no CORS in dev. Start the backend first.
   `meta = { source, fetched_at, fetched_age_hours, is_stale, degraded, live_quote_source, stale_after_hours, note }`.
 - `POST /api/refresh` with body `{ "ticker": "NVDA" }` (one) or `{}` (whole watch-list ∪ cached
   tickers) → `{ requested, refreshed, failed }`.
+
+Accounts & per-user data (all except login require a `Authorization: Bearer <token>` header):
+
+- `POST /api/auth/login` `{username, password}` → `{ token, username, is_admin }`;
+  `POST /api/auth/logout`; `GET /api/auth/me`.
+- `GET/POST/DELETE /api/admin/users[/{username}]` (admin only) — list / create / remove accounts.
+- `GET/POST/DELETE /api/me/watchlist[/{ticker}]`, `GET/PUT /api/me/preferences`,
+  `GET/PUT /api/me/notes/{ticker}`, `GET /api/me/recent` — the signed-in user's own data.
 
 `degraded: true` means a live refresh was attempted this request and failed, so cached data is being
 served (the banner says so). `is_stale: true` means the snapshot is older than `STALE_AFTER_HOURS`.
@@ -300,31 +310,24 @@ apt -y install certbot python3-certbot-nginx
 certbot --nginx -d yourdomain.com
 ```
 
-### 10. Lock it down with a login (optional)
+### 10. User accounts (login)
 
-The nginx config supports HTTP Basic Auth that gates the **whole** site (page + API) —
-nothing is served without a valid login, and the browser auto-attaches the credentials to the
-SPA's API calls, so no app changes are needed. Create the password file (bcrypt-hashed):
-
-```bash
-apt -y install apache2-utils
-# first account (-c creates the file):
-htpasswd -B -c /etc/nginx/.htpasswd_stockclock alice
-# more accounts (NO -c, or you'll wipe the file):
-htpasswd -B /etc/nginx/.htpasswd_stockclock bob
-chown root:www-data /etc/nginx/.htpasswd_stockclock && chmod 640 /etc/nginx/.htpasswd_stockclock
-```
-
-The `auth_basic` directives are already in `deploy/nginx.conf`. After creating the file,
-`nginx -t && systemctl reload nginx`. Manage accounts anytime:
+Access is gated by **app-level accounts** (admin-created — no open signup). Set a bootstrap admin in
+the env file; it's created on first startup, and the admin can then add/remove accounts from the UI
+("Manage accounts" in the user menu) or via the API.
 
 ```bash
-htpasswd -B /etc/nginx/.htpasswd_stockclock <user>     # add or change a password
-htpasswd -D /etc/nginx/.htpasswd_stockclock <user>     # remove an account
+# in /etc/stockclock/stockclock.env
+ADMIN_USERNAME=you@example.com
+ADMIN_PASSWORD=a-strong-password
+SESSION_TTL_DAYS=30
 ```
 
-The Let's Encrypt challenge path is exempted from auth so cert auto-renewal keeps working
-(verify with `certbot renew --dry-run`).
+Passwords are PBKDF2-hashed; sessions are revocable server-side Bearer tokens. The SPA stores its
+token in `localStorage` and sends it on every API call. All `/api/*` endpoints except `/api/health`
+and `/api/auth/login` require a valid session. Each account has its own watchlist, preferences,
+notes, and recently-viewed history. Restart after changing the bootstrap env:
+`systemctl restart stockclock-api`.
 
 ### Updating later
 

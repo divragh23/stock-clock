@@ -95,6 +95,44 @@ class StockResponse(BaseModel):
     earnings: list[EarningsReaction] = []
 
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    token: str
+    username: str
+    is_admin: bool = False
+
+
+class UserOut(BaseModel):
+    username: str
+    is_admin: bool = False
+
+
+class CreateUserRequest(BaseModel):
+    username: str
+    password: str
+    is_admin: bool = False
+
+
+class AdminUser(BaseModel):
+    username: str
+    is_admin: bool = False
+    created_at: Optional[str] = None
+
+
+class PreferencesModel(BaseModel):
+    default_ticker: Optional[str] = None
+    default_range: Optional[str] = None
+
+
+class NoteModel(BaseModel):
+    ticker: str
+    body: str = ""
+
+
 class SymbolMatch(BaseModel):
     symbol: str
     name: str = ""

@@ -27,6 +27,14 @@ def _split_tickers(raw: str) -> list[str]:
 # --- Secrets / sources -------------------------------------------------------
 FINNHUB_API_KEY: str = os.getenv("FINNHUB_API_KEY", "").strip()
 
+# --- Accounts / sessions -----------------------------------------------------
+# Bootstrap admin: if set and the users table is empty, this account is created
+# (is_admin) on startup. Admin can then create/remove other accounts via the API.
+ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "").strip().lower()
+ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "")
+# How long a login session stays valid.
+SESSION_TTL_DAYS: int = int(os.getenv("SESSION_TTL_DAYS", "30"))
+
 # --- Cache -------------------------------------------------------------------
 # Persist the SQLite file at a stable path on the droplet (e.g.
 # /var/lib/stockclock/cache.db). Defaults to a file next to the backend for

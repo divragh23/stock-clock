@@ -11,6 +11,7 @@ import {
 import { money, shortDate, prettyDate } from "../format.js";
 
 const RANGES = [
+  { key: "1w", label: "1W", days: 8 },
   { key: "1m", label: "1M", days: 31 },
   { key: "3m", label: "3M", days: 92 },
   { key: "6m", label: "6M", days: 183 },

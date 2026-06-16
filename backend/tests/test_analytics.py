@@ -123,6 +123,17 @@ def test_surprise_pct_guards_zero_estimate():
     assert analytics._surprise_pct(0.5, 1.0) == -0.5
 
 
+def test_trailing_returns_tolerates_null_latest_close():
+    # A junk trailing bar with no close (an in-progress session) must not crash
+    # the return math — guards should yield None pct rather than dividing by None.
+    closes = [100 + i for i in range(30)]
+    prices = _series(date(2024, 1, 1), closes)
+    prices.append({"date": "2099-01-01", "open": None, "high": None, "low": None,
+                   "close": None, "volume": 0})
+    res = analytics.trailing_returns(prices)  # must not raise
+    assert isinstance(res["returns"], list) and len(res["returns"]) == 6
+
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     passed = 0

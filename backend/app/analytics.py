@@ -132,7 +132,8 @@ def trailing_returns(prices: list[dict]) -> dict:
             if ref_close:
                 entry["ref_date"] = dates[ref_idx].isoformat()
                 entry["ref_close"] = ref_close
-                entry["pct"] = latest_close / ref_close - 1
+                if latest_close is not None:
+                    entry["pct"] = latest_close / ref_close - 1
         result["returns"].append(entry)
 
     return result

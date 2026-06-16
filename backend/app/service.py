@@ -68,7 +68,7 @@ def _live_quote_from_snapshot(snapshot: dict) -> dict:
     last = prices[-1]
     prev = prices[-2] if len(prices) >= 2 else None
     change = None
-    if prev and prev.get("close"):
+    if prev and prev.get("close") and last.get("close") is not None:
         change = last["close"] / prev["close"] - 1
     return {
         "price": last.get("close"),

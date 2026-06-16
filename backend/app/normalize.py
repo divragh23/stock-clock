@@ -58,13 +58,19 @@ def _col(row: pd.Series, *names: str) -> Any:
 def normalize_prices(price_df: pd.DataFrame) -> list[dict]:
     prices: list[dict] = []
     for idx, row in price_df.iterrows():
+        close = _f(_col(row, "Close"))
+        if close is None:
+            # Skip partial/empty bars — e.g. the in-progress session yfinance may
+            # return for "today". They aren't real sessions and a null close
+            # breaks every return/quote calculation downstream.
+            continue
         prices.append(
             {
                 "date": _iso_date(idx),
                 "open": _f(_col(row, "Open")),
                 "high": _f(_col(row, "High")),
                 "low": _f(_col(row, "Low")),
-                "close": _f(_col(row, "Close")),
+                "close": close,
                 "volume": _i(_col(row, "Volume")),
             }
         )

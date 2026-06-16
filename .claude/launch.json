@@ -6,7 +6,8 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "frontend"],
       "port": 5173,
-      "autoPort": false
+      "autoPort": false,
+      "env": { "VITE_PROXY_TARGET": "https://stock.div23.app" }
     }
   ]
 }

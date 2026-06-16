@@ -9,6 +9,7 @@ export const THEMES = {
       "--pos": "#2ecc71", "--neg": "#ff5d5d", "--grid": "#1e2636", "--axis": "#5a6678",
     },
     burst: ["#4c8dff", "#1a2130", "#2ecc71"],
+    gradient: { color1: "#1a2d5e", color2: "#4c8dff", color3: "#0b0e14" },
   },
   graphite: {
     label: "Graphite",
@@ -18,6 +19,7 @@ export const THEMES = {
       "--pos": "#3ecf8e", "--neg": "#ff6b6b", "--grid": "#222328", "--axis": "#5c5e66",
     },
     burst: ["#7c8cff", "#202227", "#3ecf8e"],
+    gradient: { color1: "#2a2650", color2: "#7c8cff", color3: "#0e0e10" },
   },
   emerald: {
     label: "Emerald",
@@ -27,6 +29,7 @@ export const THEMES = {
       "--pos": "#16c784", "--neg": "#ff5d5d", "--grid": "#16271f", "--axis": "#4e7565",
     },
     burst: ["#16c784", "#16271f", "#85a89a"],
+    gradient: { color1: "#0a3d2a", color2: "#16c784", color3: "#08120e" },
   },
   violet: {
     label: "Violet",
@@ -36,6 +39,7 @@ export const THEMES = {
       "--pos": "#2ecc71", "--neg": "#ff5d6c", "--grid": "#1f1a35", "--axis": "#5e5685",
     },
     burst: ["#8b5cf6", "#1f1a35", "#ff5d6c"],
+    gradient: { color1: "#2e1a5e", color2: "#8b5cf6", color3: "#0e0b18" },
   },
   daylight: {
     label: "Daylight",
@@ -45,6 +49,7 @@ export const THEMES = {
       "--pos": "#0a9d57", "--neg": "#e23b41", "--grid": "#e6eaf2", "--axis": "#9aa6ba",
     },
     burst: ["#2f6df0", "#eef1f7", "#0a9d57"],
+    gradient: { color1: "#c8d4e8", color2: "#2f6df0", color3: "#f5f7fb" },
   },
 };
 
@@ -65,6 +70,11 @@ export function applyTheme(name) {
 export function burstColors() {
   const t = currentTheme();
   return (THEMES[t] || THEMES.midnight).burst;
+}
+
+export function gradientColors() {
+  const t = currentTheme();
+  return (THEMES[t] || THEMES.midnight).gradient;
 }
 
 export function loadTheme() {

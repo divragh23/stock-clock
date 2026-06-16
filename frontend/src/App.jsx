@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import * as api from "./api.js";
+import { gradientColors } from "./theme.js";
 import StatusBanner from "./components/StatusBanner.jsx";
 import TickerInput from "./components/TickerInput.jsx";
 import PerformanceDashboard from "./components/PerformanceDashboard.jsx";
@@ -10,6 +11,7 @@ import MyBar from "./components/MyBar.jsx";
 import NotesBox from "./components/NotesBox.jsx";
 import AdminPanel from "./components/AdminPanel.jsx";
 import ThemeDial from "./components/ThemeDial.jsx";
+import Grainient from "./components/Grainient.jsx";
 
 const FALLBACK_TICKER = "NVDA";
 
@@ -29,6 +31,7 @@ export default function App() {
   const [prefs, setPrefs] = useState({ default_ticker: null, default_range: null });
   const [note, setNote] = useState("");
   const [showAdmin, setShowAdmin] = useState(false);
+  const [gradient, setGradient] = useState(gradientColors);
 
   const load = useCallback(async (t, { forceRefresh = false } = {}) => {
     setLoading(true);
@@ -117,6 +120,28 @@ export default function App() {
 
   return (
     <div className={`app ${entering ? "app-enter" : ""}`}>
+      <div className="app-bg">
+        <Grainient
+          color1={gradient.color1}
+          color2={gradient.color2}
+          color3={gradient.color3}
+          timeSpeed={0.15}
+          colorBalance={0.0}
+          warpStrength={0.8}
+          warpFrequency={4.0}
+          warpSpeed={1.5}
+          warpAmplitude={60.0}
+          blendSoftness={0.1}
+          rotationAmount={400.0}
+          noiseScale={1.8}
+          grainAmount={0.06}
+          grainScale={2.0}
+          contrast={1.3}
+          gamma={1.0}
+          saturation={0.9}
+          zoom={1.0}
+        />
+      </div>
       <header className="app-header">
         <div className="brand">
           <span className="brand-mark">&#9716;</span> Stock Clock
@@ -196,7 +221,7 @@ export default function App() {
 
       {showAdmin && <AdminPanel me={user} onClose={() => setShowAdmin(false)} />}
 
-      <ThemeDial />
+      <ThemeDial onThemeChange={() => setGradient(gradientColors())} />
 
       <footer className="app-footer">
         <span>

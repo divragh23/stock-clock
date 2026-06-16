@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import * as api from "../api.js";
+import PrismaticBurst from "./PrismaticBurst.jsx";
+import { burstColors } from "../theme.js";
 
 export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
+
+  const colors = useMemo(() => burstColors(), []);
 
   async function submit(e) {
     e.preventDefault();
@@ -23,9 +27,23 @@ export default function LoginPage({ onLogin }) {
 
   return (
     <div className="login-wrap">
+      <div className="login-burst">
+        <PrismaticBurst
+          animationType="rotate3d"
+          intensity={1.4}
+          speed={0.3}
+          distort={0.8}
+          paused={false}
+          offset={{ x: 0, y: 0 }}
+          hoverDampness={0.25}
+          rayCount={20}
+          mixBlendMode="lighten"
+          colors={colors}
+        />
+      </div>
       <form className="login-card" onSubmit={submit}>
         <div className="login-brand">
-          <span className="brand-mark">◴</span> Stock Clock
+          <span className="brand-mark">&#9716;</span> Stock Clock
         </div>
         <p className="login-sub">Sign in to your account</p>
 

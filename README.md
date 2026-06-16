@@ -177,6 +177,9 @@ origin — no CORS in dev. Start the backend first.
 
 - `GET /api/health` →
   `{ status, last_refresh, active_sources, stale_tickers, cached_tickers, watchlist }`
+- `GET /api/search?q=...` → `[{ symbol, name, exchange, type }]` — resolves a company name or
+  partial ticker to symbols (Yahoo via yfinance primary, Finnhub `/search` fallback). Powers the
+  typeahead so users can type "Apple" instead of "AAPL".
 - `GET /api/stock/{ticker}` (optional `?refresh=true`) → the unified payload:
   `{ ticker, meta, live_quote, performance, earnings }` where
   `meta = { source, fetched_at, fetched_age_hours, is_stale, degraded, live_quote_source, stale_after_hours, note }`.

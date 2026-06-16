@@ -300,6 +300,32 @@ apt -y install certbot python3-certbot-nginx
 certbot --nginx -d yourdomain.com
 ```
 
+### 10. Lock it down with a login (optional)
+
+The nginx config supports HTTP Basic Auth that gates the **whole** site (page + API) —
+nothing is served without a valid login, and the browser auto-attaches the credentials to the
+SPA's API calls, so no app changes are needed. Create the password file (bcrypt-hashed):
+
+```bash
+apt -y install apache2-utils
+# first account (-c creates the file):
+htpasswd -B -c /etc/nginx/.htpasswd_stockclock alice
+# more accounts (NO -c, or you'll wipe the file):
+htpasswd -B /etc/nginx/.htpasswd_stockclock bob
+chown root:www-data /etc/nginx/.htpasswd_stockclock && chmod 640 /etc/nginx/.htpasswd_stockclock
+```
+
+The `auth_basic` directives are already in `deploy/nginx.conf`. After creating the file,
+`nginx -t && systemctl reload nginx`. Manage accounts anytime:
+
+```bash
+htpasswd -B /etc/nginx/.htpasswd_stockclock <user>     # add or change a password
+htpasswd -D /etc/nginx/.htpasswd_stockclock <user>     # remove an account
+```
+
+The Let's Encrypt challenge path is exempted from auth so cert auto-renewal keeps working
+(verify with `certbot renew --dry-run`).
+
 ### Updating later
 
 ```bash

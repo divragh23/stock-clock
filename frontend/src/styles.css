@@ -28,7 +28,7 @@ body {
 .app {
   max-width: 1040px;
   margin: 0 auto;
-  padding: 20px 18px 60px;
+  padding: 72px 18px 60px;
 }
 
 /* --- login → dashboard transition --- */
@@ -42,10 +42,15 @@ body {
 
 /* --- header --- */
 .app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
+  padding: 18px 24px;
+  z-index: 90;
+  background: var(--bg);
 }
 .brand {
   font-size: 20px;

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function LiveClock() {
+export default function LiveClock({ size } = {}) {
   const [now, setNow] = useState(() => new Date());
   const rafRef = useRef(0);
 
@@ -29,7 +29,7 @@ export default function LiveClock() {
   const digital = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
   return (
-    <div className="live-clock">
+    <div className={`live-clock ${size === "large" ? "live-clock-lg" : ""}`}>
       <svg
         className="live-clock-face"
         viewBox="0 0 100 100"

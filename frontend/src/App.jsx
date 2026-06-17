@@ -13,12 +13,14 @@ import AdminPanel from "./components/AdminPanel.jsx";
 import ThemeDial from "./components/ThemeDial.jsx";
 import Grainient from "./components/Grainient.jsx";
 import LiveClock from "./components/LiveClock.jsx";
+import WelcomeScreen from "./components/WelcomeScreen.jsx";
 
 const FALLBACK_TICKER = "NVDA";
 
 export default function App() {
   const [user, setUser] = useState(undefined);
   const [entering, setEntering] = useState(false);
+  const [welcomeUser, setWelcomeUser] = useState(null);
 
   const [ticker, setTicker] = useState(FALLBACK_TICKER);
   const [data, setData] = useState(null);
@@ -75,9 +77,14 @@ export default function App() {
   }, [user, load]);
 
   function handleLogin(u) {
+    setWelcomeUser(u);
+  }
+
+  function handleWelcomeComplete() {
     setEntering(true);
-    setUser(u);
-    setTimeout(() => setEntering(false), 600);
+    setUser(welcomeUser);
+    setWelcomeUser(null);
+    setTimeout(() => setEntering(false), 800);
   }
 
   async function toggleWatch() {
@@ -114,6 +121,7 @@ export default function App() {
   }
 
   if (user === undefined) return <div className="loading">Loading…</div>;
+  if (welcomeUser) return <WelcomeScreen user={welcomeUser} gradient={gradient} onComplete={handleWelcomeComplete} />;
   if (user === null) return <LoginPage onLogin={handleLogin} />;
 
   const inWatchlist = !!data && watchlist.includes(data.ticker);

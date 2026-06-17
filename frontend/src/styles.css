@@ -70,6 +70,7 @@ body {
 /* ---- app shell ---- */
 .app {
   position: relative;
+  isolation: isolate;
   max-width: 1100px;
   margin: 0 auto;
   padding: 80px 24px 60px;
@@ -78,7 +79,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: -1;
-  opacity: 0.15;
+  opacity: 0.6;
   pointer-events: none;
 }
 @keyframes dashEnter {
@@ -259,8 +260,10 @@ body {
   align-items: flex-start;
   padding: 14px 16px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   margin-bottom: 18px;
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
   transition: background var(--transition);
 }
 .banner-dot {
@@ -396,8 +399,10 @@ body {
   margin-bottom: 24px;
 }
 .return-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   border-radius: var(--radius-md);
   padding: 16px;
   transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
@@ -439,8 +444,10 @@ body {
 
 /* ---- chart cards ---- */
 .chart-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 22px;
@@ -493,8 +500,10 @@ body {
 /* ---- earnings table ---- */
 .table-wrap {
   overflow-x: auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   border-radius: var(--radius-lg);
 }
 .earn-table {
@@ -515,7 +524,7 @@ body {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  background: var(--surface-2);
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
 }
 .earn-table th:first-child { border-radius: var(--radius-lg) 0 0 0; }
 .earn-table th:last-child { border-radius: 0 var(--radius-lg) 0 0; }
@@ -996,8 +1005,10 @@ body {
 
 /* ---- notes ---- */
 .notes-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 22px;
@@ -1071,8 +1082,10 @@ body {
 .modal {
   width: 100%;
   max-width: 540px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   border-radius: var(--radius-xl);
   padding: 28px;
   max-height: 80vh;

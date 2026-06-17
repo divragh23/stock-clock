@@ -151,23 +151,23 @@ export default function App() {
         zoom={1.0}
       />
     </div>
+    <header className={`app-header ${entering ? "header-enter" : ""} ${welcomeUser ? "app-preload" : ""}`}>
+      <div className="brand">
+        <LiveClock /> Stock Clock
+      </div>
+      <div className="header-center">
+        <TickerInput
+          current={data?.ticker}
+          loading={loading}
+          onSubmit={(t) => load(t)}
+          onRefresh={() => load(ticker, { forceRefresh: true })}
+        />
+      </div>
+      <div className="header-right">
+        <UserMenu user={user} onManageAccounts={() => setShowAdmin(true)} onLogout={handleLogout} />
+      </div>
+    </header>
     <div className={`app ${entering ? "app-enter" : ""} ${welcomeUser ? "app-preload" : ""}`}>
-      <header className="app-header">
-        <div className="brand">
-          <LiveClock /> Stock Clock
-        </div>
-        <div className="header-center">
-          <TickerInput
-            current={data?.ticker}
-            loading={loading}
-            onSubmit={(t) => load(t)}
-            onRefresh={() => load(ticker, { forceRefresh: true })}
-          />
-        </div>
-        <div className="header-right">
-          <UserMenu user={user} onManageAccounts={() => setShowAdmin(true)} onLogout={handleLogout} />
-        </div>
-      </header>
 
       {data?.meta && <StatusBanner meta={data.meta} />}
 

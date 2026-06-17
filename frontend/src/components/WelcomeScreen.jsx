@@ -18,7 +18,7 @@ export default function WelcomeScreen({ user, gradient, onComplete }) {
     t(() => setPhase("hold"), 800 + typeLen + 1000);
     t(() => setPhase("flicker"), 800 + typeLen + 2200);
     t(() => setPhase("fade-out"), 800 + typeLen + 3400);
-    t(() => onComplete(), 800 + typeLen + 4400);
+    t(() => onComplete(), 800 + typeLen + 3800);
 
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);

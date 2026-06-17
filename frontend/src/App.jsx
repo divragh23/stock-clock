@@ -77,12 +77,12 @@ export default function App() {
   }, [user, load]);
 
   function handleLogin(u) {
+    setUser(u);
     setWelcomeUser(u);
   }
 
   function handleWelcomeComplete() {
     setEntering(true);
-    setUser(welcomeUser);
     setWelcomeUser(null);
     setTimeout(() => setEntering(false), 800);
   }
@@ -121,14 +121,15 @@ export default function App() {
   }
 
   if (user === undefined) return <div className="loading">Loading…</div>;
-  if (welcomeUser) return <WelcomeScreen user={welcomeUser} gradient={gradient} onComplete={handleWelcomeComplete} />;
-  if (user === null) return <LoginPage onLogin={handleLogin} />;
+  if (user === null && !welcomeUser) return <LoginPage onLogin={handleLogin} />;
 
   const inWatchlist = !!data && watchlist.includes(data.ticker);
   const isDefault = prefs?.default_ticker === ticker && prefs?.default_range === chartRange;
 
   return (
-    <div className={`app ${entering ? "app-enter" : ""}`}>
+    <>
+    {welcomeUser && <WelcomeScreen user={welcomeUser} gradient={gradient} onComplete={handleWelcomeComplete} />}
+    <div className={`app ${entering ? "app-enter" : ""} ${welcomeUser ? "app-preload" : ""}`}>
       <div className="app-bg">
         <Grainient
           color1={gradient.color1}
@@ -238,5 +239,6 @@ export default function App() {
         </span>
       </footer>
     </div>
+    </>
   );
 }

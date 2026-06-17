@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import Grainient from "./Grainient.jsx";
 import LiveClock from "./LiveClock.jsx";
 
-export default function WelcomeScreen({ user, gradient, onComplete }) {
+export default function WelcomeScreen({ user, gradient, loaded, onComplete }) {
   const [phase, setPhase] = useState("clock-in");
+  const [progress, setProgress] = useState(0);
   const nameRef = useRef("");
 
   const raw = user?.username || "";
@@ -23,9 +24,21 @@ export default function WelcomeScreen({ user, gradient, onComplete }) {
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
+  useEffect(() => {
+    const id = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 100) return 100;
+        if (loaded) return Math.min(100, p + 6);
+        return Math.min(82, p + (Math.random() * 2.5 + 0.5));
+      });
+    }, 120);
+    return () => clearInterval(id);
+  }, [loaded]);
+
   const showText = phase !== "clock-in";
   const flickering = phase === "flicker";
   const fading = phase === "fade-out";
+  const pct = Math.round(progress);
 
   return (
     <div className={`welcome-screen ${fading ? "welcome-fade-out" : ""}`}>
@@ -59,6 +72,14 @@ export default function WelcomeScreen({ user, gradient, onComplete }) {
             </span>
           </div>
         )}
+        <div className={`welcome-loader ${fading ? "welcome-el-fade" : ""}`}>
+          <span className="welcome-loader-text">Loading assets</span>
+          <span className="welcome-loader-dots" />
+          <span className="welcome-loader-pct">{pct}%</span>
+          <div className="welcome-loader-bar">
+            <div className="welcome-loader-fill" style={{ width: `${pct}%` }} />
+          </div>
+        </div>
       </div>
     </div>
   );

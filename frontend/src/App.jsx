@@ -128,30 +128,30 @@ export default function App() {
 
   return (
     <>
-    {welcomeUser && <WelcomeScreen user={welcomeUser} gradient={gradient} onComplete={handleWelcomeComplete} />}
+    {welcomeUser && <WelcomeScreen user={welcomeUser} gradient={gradient} loaded={!!data} onComplete={handleWelcomeComplete} />}
+    <div className="app-bg">
+      <Grainient
+        color1={gradient.color1}
+        color2={gradient.color2}
+        color3={gradient.color3}
+        timeSpeed={0.15}
+        colorBalance={0.0}
+        warpStrength={0.8}
+        warpFrequency={4.0}
+        warpSpeed={1.5}
+        warpAmplitude={60.0}
+        blendSoftness={0.1}
+        rotationAmount={400.0}
+        noiseScale={1.8}
+        grainAmount={0.06}
+        grainScale={2.0}
+        contrast={1.3}
+        gamma={1.0}
+        saturation={0.9}
+        zoom={1.0}
+      />
+    </div>
     <div className={`app ${entering ? "app-enter" : ""} ${welcomeUser ? "app-preload" : ""}`}>
-      <div className="app-bg">
-        <Grainient
-          color1={gradient.color1}
-          color2={gradient.color2}
-          color3={gradient.color3}
-          timeSpeed={0.15}
-          colorBalance={0.0}
-          warpStrength={0.8}
-          warpFrequency={4.0}
-          warpSpeed={1.5}
-          warpAmplitude={60.0}
-          blendSoftness={0.1}
-          rotationAmount={400.0}
-          noiseScale={1.8}
-          grainAmount={0.06}
-          grainScale={2.0}
-          contrast={1.3}
-          gamma={1.0}
-          saturation={0.9}
-          zoom={1.0}
-        />
-      </div>
       <header className="app-header">
         <div className="brand">
           <LiveClock /> Stock Clock

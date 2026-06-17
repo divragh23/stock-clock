@@ -12,6 +12,7 @@ import NotesBox from "./components/NotesBox.jsx";
 import AdminPanel from "./components/AdminPanel.jsx";
 import ThemeDial from "./components/ThemeDial.jsx";
 import Grainient from "./components/Grainient.jsx";
+import LiveClock from "./components/LiveClock.jsx";
 
 const FALLBACK_TICKER = "NVDA";
 
@@ -144,7 +145,7 @@ export default function App() {
       </div>
       <header className="app-header">
         <div className="brand">
-          <span className="brand-mark">&#9716;</span> Stock Clock
+          <LiveClock /> Stock Clock
         </div>
         <div className="header-center">
           <TickerInput

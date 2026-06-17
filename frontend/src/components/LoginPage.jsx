@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import * as api from "../api.js";
 import PrismaticBurst from "./PrismaticBurst.jsx";
+import LiveClock from "./LiveClock.jsx";
 import { burstColors } from "../theme.js";
 
 export default function LoginPage({ onLogin }) {
@@ -43,7 +44,7 @@ export default function LoginPage({ onLogin }) {
       </div>
       <form className="login-card" onSubmit={submit}>
         <div className="login-brand">
-          <span className="brand-mark">&#9716;</span> Stock Clock
+          <LiveClock /> Stock Clock
         </div>
         <p className="login-sub">Sign in to your account</p>
 

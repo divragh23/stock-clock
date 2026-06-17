@@ -115,11 +115,36 @@ body {
   align-items: center;
   gap: 6px;
 }
-.brand-mark {
-  color: var(--accent);
-  font-size: 22px;
-  line-height: 1;
+.live-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+.live-clock-face {
+  width: 32px;
+  height: 32px;
   filter: drop-shadow(0 0 6px rgba(76, 141, 255, 0.4));
+}
+.live-clock-digital {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--accent);
+  line-height: 1;
+  opacity: 0.85;
+}
+.login-brand .live-clock {
+  gap: 3px;
+}
+.login-brand .live-clock-face {
+  width: 38px;
+  height: 38px;
+}
+.login-brand .live-clock-digital {
+  font-size: 10px;
 }
 .header-center {
   flex: 1;

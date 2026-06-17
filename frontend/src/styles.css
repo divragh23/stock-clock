@@ -305,6 +305,7 @@ body {
 }
 .header-right {
   flex: 0 0 auto;
+  margin-left: auto;
 }
 
 /* ---- ticker search ---- */

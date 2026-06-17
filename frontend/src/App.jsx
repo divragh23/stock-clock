@@ -155,21 +155,11 @@ export default function App() {
       <div className="brand">
         <LiveClock /> Stock Clock
       </div>
-      <div className="header-center">
-        <TickerInput
-          current={data?.ticker}
-          loading={loading}
-          onSubmit={(t) => load(t)}
-          onRefresh={() => load(ticker, { forceRefresh: true })}
-        />
-      </div>
       <div className="header-right">
         <UserMenu user={user} onManageAccounts={() => setShowAdmin(true)} onLogout={handleLogout} />
       </div>
     </header>
     <div className={`app ${entering ? "app-enter" : ""} ${welcomeUser ? "app-preload" : ""}`}>
-
-      {data?.meta && <StatusBanner meta={data.meta} />}
 
       {error && (
         <div className="banner banner-error" role="alert">
@@ -180,6 +170,13 @@ export default function App() {
           </div>
         </div>
       )}
+
+      <TickerInput
+        current={data?.ticker}
+        loading={loading}
+        onSubmit={(t) => load(t)}
+        onRefresh={() => load(ticker, { forceRefresh: true })}
+      />
 
       <MyBar
         watchlist={watchlist}
@@ -232,6 +229,8 @@ export default function App() {
       {showAdmin && <AdminPanel me={user} onClose={() => setShowAdmin(false)} />}
 
       <ThemeDial onThemeChange={() => setGradient(gradientColors())} />
+
+      {data?.meta && <StatusBanner meta={data.meta} />}
 
       <footer className="app-footer">
         <span>
